@@ -31,6 +31,13 @@ fastdfs是阿里巴巴开源的，用C语言写的一个优秀的文件系统，
 
 管理平台：node.js、layui等
 
+fastdfs如何安装部署，可看本人博客：
+
+https://blog.csdn.net/KokJuis
+
+https://blog.csdn.net/KokJuis/article/details/76147489
+
+
 ![image](https://github.com/gogym/gogym-oss/blob/master/1.png)
 
 ![image](https://github.com/gogym/gogym-oss/blob/master/2.png)
