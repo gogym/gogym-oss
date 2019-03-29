@@ -39,7 +39,6 @@ public class ConnectionPoolFactory {
 	 * 
 	 * @Description: 修改属性
 	 * @param poolConfig
-	 * @author: Aaron
 	 * @date: 2017年7月12日 下午6:59:02
 	 */
 	@SuppressWarnings("unused")

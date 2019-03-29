@@ -50,8 +50,6 @@ public class FastDFSTemplate {
 	 *            后缀，如：jpg、bmp（注意不带.）
 	 * @return
 	 * @throws FastDFSException
-	 * @author: Aaron
-	 * @date: 2017年7月12日 下午7:01:32
 	 */
 	public FastDfsInfo upload(byte[] data, String ext) throws FastDFSException {
 		return this.upload(data, ext, null);
@@ -66,8 +64,6 @@ public class FastDFSTemplate {
 	 * @param values
 	 * @return
 	 * @throws FastDFSException
-	 * @author: Aaron
-	 * @date: 2017年7月12日 下午7:01:55
 	 */
 	public FastDfsInfo upload(byte[] data, String ext,
 			Map<String, String> values) throws FastDFSException {
@@ -105,8 +101,6 @@ public class FastDFSTemplate {
 	 * @param dfs
 	 * @return
 	 * @throws FastDFSException
-	 * @author: Aaron
-	 * @date: 2017年7月12日 下午7:02:27
 	 */
 	public byte[] loadFile(FastDfsInfo dfs) throws FastDFSException {
 		return this.loadFile(dfs.getGroup(), dfs.getPath());
@@ -119,8 +113,6 @@ public class FastDFSTemplate {
 	 * @param remoteFileName
 	 * @return
 	 * @throws FastDFSException
-	 * @author: Aaron
-	 * @date: 2017年7月12日 下午7:02:46
 	 */
 	public byte[] loadFile(String remoteFileName) throws FastDFSException {
 		StorageClient client = getClient();
@@ -141,8 +133,6 @@ public class FastDFSTemplate {
 	 * @param remoteFileName
 	 * @return
 	 * @throws FastDFSException
-	 * @author: Aaron
-	 * @date: 2017年7月12日 下午7:02:46
 	 */
 	public byte[] loadFile(String groupName, String remoteFileName)
 			throws FastDFSException {
@@ -161,8 +151,6 @@ public class FastDFSTemplate {
 	 * @Description: 删除文件
 	 * @param dfs
 	 * @throws FastDFSException
-	 * @author: Aaron
-	 * @date: 2017年7月12日 下午7:02:59
 	 */
 	public void deleteFile(FastDfsInfo dfs) throws FastDFSException {
 		this.deleteFile(dfs.getGroup(), dfs.getPath());
@@ -174,8 +162,6 @@ public class FastDFSTemplate {
 	 * @param groupName
 	 * @param remoteFileName
 	 * @throws FastDFSException
-	 * @author: Aaron
-	 * @date: 2017年7月12日 下午7:03:13
 	 */
 	public void deleteFile(String groupName, String remoteFileName)
 			throws FastDFSException {
@@ -202,8 +188,6 @@ public class FastDFSTemplate {
 	 * @throws IOException
 	 * @throws NoSuchAlgorithmException
 	 * @throws MyException
-	 * @author: Aaron
-	 * @date: 2017年7月12日 下午7:03:34
 	 */
 	public String setFileAbsolutePath(String group, String path)
 			throws IOException, NoSuchAlgorithmException, MyException {

@@ -66,8 +66,8 @@ public class CodeGen {
 			// 根据类来生成内置的增删改查sql语句，并打印到控制台
 			// sqlManager.genBuiltInSqlToConsole(Class z);
 
-			 sqlManager.genPojoCode("oss_api_call_log", "pres.gogym.dfs.module.model", config);
-			 sqlManager.genSQLFile("oss_api_call_log", config);
+			 //sqlManager.genPojoCode("oss_api_call_log", "pres.gogym.dfs.module.model", config);
+			 //sqlManager.genSQLFile("oss_api_call_log", config);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
