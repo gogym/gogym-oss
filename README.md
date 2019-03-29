@@ -31,3 +31,10 @@ fastdfs是阿里巴巴开源的，用C语言写的一个优秀的文件系统，
 
 管理平台：node.js、layui等
 
+![image](https://github.com/gogym/gogym-oss/blob/master/1.png)
+
+![image](https://github.com/gogym/gogym-oss/blob/master/2.png)
+
+![image](https://github.com/gogym/gogym-oss/blob/master/3.png)
+
+![image](https://github.com/gogym/gogym-oss/blob/master/4.png)
