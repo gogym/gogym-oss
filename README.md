@@ -37,6 +37,8 @@ https://blog.csdn.net/KokJuis
 
 https://blog.csdn.net/KokJuis/article/details/76147489
 
+项目基本倒下来就能直接用，想修改也很容易，没有什么难度。
+
 
 以下是简单的截图
 
