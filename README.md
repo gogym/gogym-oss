@@ -39,6 +39,12 @@ https://blog.csdn.net/KokJuis/article/details/76147489
 
 项目基本倒下来就能直接用，想修改也很容易，没有什么难度。
 
+oss-server是后台java项目
+
+commonModule是后台的公共模块，引入到server
+
+oss_manage是前端的node.js项目
+
 
 以下是简单的截图
 
