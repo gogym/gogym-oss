@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>添加应用</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="style/admin.css" media="all">
+</head>
+<body>
+
+<style>
+    /* 这段样式只是用于演示 */
+    #LAY-component-grid-list .demo-list .layui-card {
+        height: 460px;
+    }
+</style>
+
+
+<div class="layui-fluid" id="LAY-component-grid-list">
+    <div class="layui-row layui-col-space10 demo-list">
+        <div class="layui-col-sm4 layui-col-md3 layui-col-lg2">
+            <!-- 填充内容 -->
+            <div class="layui-card layui-form">
+
+                <div id="test7" class="cmdlist-container" data-type="uploadBtn"
+                     style="position: fixed;left: 40%;top: 10%;">
+                    <a href="javascript:;">
+                        <img id="app_img" class="layui-circle" src="style/res/bg-none.jpg"
+                             style="height: 100px;width: 100px;">
+                        <input type="text" id="appImg" name="imgUrl" class="layui-input" style="display: none;">
+                        <input type="text" id="id" name="id" class="layui-input" style="display: none;">
+
+                    </a>
+                    <div class="layui-word-aux" style="margin-top: 5%; text-align: center;">
+                        点击上传图片<br/>
+                        限制500KB
+                    </div>
+                </div>
+
+
+                <div style="position: fixed;left: 25%;top: 42%;">
+
+                    <label class="layui-form-label" id="appid"></label>
+                    <br/>
+                    <div class="layui-form-item"><label class="layui-form-label" id="appsecret"></label>
+                        <button class="layui-btn layui-btn-xs " style="margin-left: 230px;margin-top: 5px;"
+                                id="restBtn">重置
+                        </button>
+                    </div>
+                </div>
+
+
+                <div style="position: fixed;left: 18%;top: 60%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">应用名</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="name" lay-verify="required" placeholder="请输入应用名"
+                                   autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item layui-form-text">
+                        <label class="layui-form-label">备注</label>
+                        <div class="layui-input-block">
+                            <textarea name="intro" placeholder="请输入内容" class="layui-textarea"></textarea>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- 这里要隐藏一个提交按钮，用于父窗口监听-->
+                <div class="layui-form-item layui-hide">
+                    <input type="button" lay-submit lay-filter="LAY-user-front-submit" id="LAY-user-front-submit"
+                           value="确认">
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+</div>
+
+
+<script src="layui/layui.js"></script>
+<script>
+
+    //定义全局变量，用来父子页面传值
+    var id;
+
+    //获取父页面的传值
+    function byVal(id) {
+        this.id = id;
+    }
+
+    layui.config({
+        base: 'js/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'upload', 'form'], function () {
+        var $ = layui.$
+            , form = layui.form
+            , upload = layui.upload
+            , layer = layui.layer
+            , admin = layui.admin;
+
+
+        //获取是更新，获取数据填充
+        if (id) {
+            admin.req({
+                url: '/appinfo/findApp_'
+                , type: 'post'
+                , data: {"id": id}
+                , done: function (res) {
+
+                    $("#app_img").attr('src', res.data.host + res.data.imgUrl);
+                    $("#appImg").attr('value', res.data.path);
+                    $("#id").attr('value', res.data.id);
+
+                    $("input[name='name']").attr('value', res.data.name);
+                    $("textarea[name='intro']").html(res.data.intro);
+                    $("#appid").html("AppId:" + res.data.appId);
+                    $("#appsecret").html("AppSecret:" + res.data.appSecret);
+                }
+            });
+        }
+
+        var loadIndex;
+        //设定文件大小限制
+        upload.render({
+            elem: '#test7'
+            , url: '/upload/file-upload'
+            , size: 500 //限制文件大小，单位 KB
+            , acceptMime: 'image/*'
+            , before: function (obj) {
+                loadIndex = layer.load(); //上传loading
+            }
+            , done: function (res) {
+                layer.close(loadIndex);
+                $("#app_img").attr('src', res.data.pathfull);
+                $("#appImg").attr('value', res.data.path);
+            }
+            , error: function (index, upload) {
+                alert("失败");
+            }
+        });
+
+        //重置按钮
+        $("#restBtn").click(function (index) {
+
+            layer.confirm('确定要重置吗？', {
+                title: "提示",
+                btn: ['确定', '取消'] //按钮
+            }, function () {
+                admin.req({
+                    url: '/appinfo/updateAppSecret_'
+                    , type: 'post'
+                    , data: {"id": id}
+                    , done: function (res) {
+                        layer.msg('重置成功', {
+                            offset: '15px'
+                            , icon: 1
+                            , time: 1000
+                        }, function () {
+                            $("#appsecret").html("AppSecret:" + res.data.appSecret);
+                        });
+
+                    }
+                });
+            }, function (index) {
+                layer.close(index);
+            });
+
+        })
+
+
+    });
+</script>
+</body>
+</html>

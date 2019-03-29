@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>商品列表</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="style/admin.css" media="all">
+    <link rel="stylesheet" href="style/template.css" media="all">
+
+    <style type="text/css">
+        .downpanel {
+            padding: 0;
+
+        }
+
+        .downpanel .layui-select-title {
+            padding-left: 40px;
+        }
+
+        .downpanel dl {
+            color: #000;
+            top: 30px;
+            font-size: 14px;
+        }
+
+        .downpanel .layui-select-title i {
+            border-top-color: #fff;
+        }
+
+    </style>
+</head>
+<body>
+
+
+<div class="layui-fluid layadmin-cmdlist-fluid">
+    <div class="layui-card layui-form" lay-filter="component-form-element">
+        <div class="layui-card-body layui-row layui-col-space10">
+
+            <div class="layui-col-md2">
+                <select id="app" name="app">
+                    <option value="0">请选择一个应用</option>
+                </select>
+            </div>
+            <div class="layui-col-md2">
+                <button class="layui-btn layui-btn-normal" id="searchBtn">搜索</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="layui-row layui-col-space30" id="content-div">
+
+        <table class="layui-hide" id="test-table-operate" lay-filter="test-table-operate"></table>
+
+        <script type="text/html" id="test-table-operate-barDemo">
+            <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
+            <a class="layui-btn layui-btn-xs" lay-event="edit">下载</a>
+            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+        </script>
+
+    </div>
+    <div class="layui-col-space30">
+        <div id="demo0"></div>
+    </div>
+</div>
+
+
+<script src="layui/layui.js"></script>
+<script>
+    layui.config({
+        base: 'js/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'table', 'laypage'], function () {
+        var $ = layui.$
+            , form = layui.form
+            , laypage = layui.laypage
+            , admin = layui.admin
+            , table = layui.table;
+
+        var selectVal = 0;
+        var host = '';
+        var downHost = '';
+
+        //先获取一次数据总数
+        admin.req({
+            url: '/appinfo/applist_'
+            , type: 'post'
+            , done: function (res) {
+                var html = '';
+                res.data.list.forEach(function (v) {
+                    html += '<option value="' + v.appId + '">' + v.name + '</option>';
+                })
+                $("#app").append(html);
+                form.render('select')
+            }
+        });
+
+        //绑定搜索按扭
+        $("#searchBtn").click(function (index) {
+            //获取select选中的值
+            selectVal = $('#app option:selected').val();
+            table.reload('tableId', {where: {"appId": selectVal}});
+        })
+
+
+        table.render({
+            id: 'tableId'
+            , elem: '#test-table-operate'
+            , url: 'file/findList_'
+            , method: 'post'
+            , where: {"appId": selectVal}
+            , loading: true
+            , request: {
+                pageName: 'start' //页码的参数名称，默认：page
+                , limitName: 'size' //每页数据量的参数名，默认：limit
+            }, response: {
+                statusName: 'code' //规定数据状态的字段名称，默认：code
+                , statusCode: 10000 //规定成功的状态码，默认：0
+                , msgName: 'msg' //规定状态信息的字段名称，默认：msg
+                , countName: 'count' //规定数据总数的字段名称，默认：count
+                , dataName: 'data' //规定数据列表的字段名称，默认：data
+            }
+            , cellMinWidth: 80
+            , page: true
+            , cols: [[
+                {type: 'checkbox', fixed: 'left'}
+                , {field: 'id', width: '12%', title: 'ID', sort: true, fixed: 'left'}
+                , {field: 'originalName', width: '12%', title: '文件名'}
+                , {field: 'extension', width: '6%', title: '拓展名', sort: true}
+                , {field: 'byteStr', width: '10%', title: '大小'}
+                , {field: 'fromIp', width: '10%', title: '来源IP'}
+                , {field: 'storePath', width: '25.8%', title: '相对路径', sort: true}
+                , {field: 'createTime', width: '10%', title: '上传时间', sort: true}
+                , {width: '10%', align: 'center', fixed: 'right', toolbar: '#test-table-operate-barDemo'}
+            ]]
+            , parseData: function (res) { //res 即为原始返回的数据
+                host = res.data.host;
+                downHost = res.data.downHost;
+                return {
+                    "code": res.code, //解析接口状态
+                    "msg": res.msg, //解析提示文本
+                    "count": res.data.total, //解析数据长度
+                    "data": res.data.list //解析数据列表
+                };
+            }
+
+        });
+
+
+        //监听表格复选框选择
+        table.on('checkbox(test-table-operate)', function (obj) {
+            console.log(obj)
+        });
+        //监听工具条
+        table.on('tool(test-table-operate)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'detail') {
+
+                //获取拓展名
+                var extension = data.extension;
+                var storePath = data.storePath;
+
+                if (extension == 'jpg' || extension == 'png' || extension == 'gif') {
+                    layer.photos({
+                        photos: {
+                            "title": "查看头像" //相册标题
+                            , "data": [{
+                                "src": host + storePath //原图地址
+                            }]
+                        }
+                        , area: 'auto'
+                        , shade: 0.01
+                        , closeBtn: 1
+                        , anim: 5
+                    });
+                }else{
+
+                    layer.msg('暂时只支持查看图片哦', {
+                        offset: '15px'
+                        , icon: 1
+                        , time: 2000
+                    });
+
+                }
+
+            } else if (obj.event === 'del') {
+                layer.confirm('真的删除么', function (index) {
+
+                    admin.req({
+                        url: '/file/delFile_'
+                        , type: 'post'
+                        ,data:{"id":data.id,"storePath":data.storePath}
+                        , done: function (res) {
+                            table.reload('tableId', {where: {"appId": selectVal}});
+                            layer.close(index);
+                        }
+                    });
+                });
+            } else if (obj.event === 'edit') {
+
+                var storePath = data.storePath;
+                window.location.href=downHost+storePath;
+
+            }
+        });
+
+
+    });
+
+
+</script>
+</body>
+</html>

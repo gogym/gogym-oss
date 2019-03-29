@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>商品列表</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="style/admin.css" media="all">
+    <link rel="stylesheet" href="style/template.css" media="all">
+
+    <style type="text/css">
+        .downpanel {
+            padding: 0;
+
+        }
+
+        .downpanel .layui-select-title {
+            padding-left: 40px;
+        }
+
+        .downpanel dl {
+            color: #000;
+            top: 30px;
+            font-size: 14px;
+        }
+
+        .downpanel .layui-select-title i {
+            border-top-color: #fff;
+        }
+
+    </style>
+</head>
+<body>
+
+
+<div class="layui-fluid layadmin-cmdlist-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header layuiadmin-card-header-auto">
+            <button class="layui-btn layuiadmin-btn-list" data-type="add">添加</button>
+        </div>
+    </div>
+
+    <div class="layui-row layui-col-space30" id="content-div">
+
+        <!--<div class="layui-col-md2 layui-col-sm4">-->
+        <!--<div class="cmdlist-container" style="text-align: center">-->
+        <!--<a href="javascript:;">-->
+        <!--<img class="layui-circle" style="height: 150px;width:150px;margin-top: 15px" src="123132 "></a>-->
+        <!--<a href="javascript:;">-->
+        <!--<div class="cmdlist-text">-->
+        <!--<p class="info">dfdf</p>-->
+        <!--<div class="price">-->
+        <!--<span class="flow">-->
+        <!--<div class="layui-btn-group layui-form">-->
+        <!--<div type="button" class=" layui-unselect layui-form-select downpanel" id="BatchBtn">-->
+        <!--<div class="layui-select-title">-->
+        <!--<i class="layui-icon layui-icon-more"></i>-->
+        <!--</div>-->
+        <!--<dl class="layui-anim layui-anim-upbit" style="margin-right: 40px;">-->
+        <!--<dd data-id="delete" title="删除选中文章到回收站">-->
+        <!--<i class="layui-icon" data-id=""></i>删除</dd>-->
+        <!--<dd data-id="move" title="移动选中文章到某栏目">-->
+        <!--<i class="layui-icon"></i>编辑</dd></dl>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--</span>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--</a>-->
+        <!--</div>-->
+        <!--</div>-->
+
+    </div>
+    <div class="layui-col-space30">
+        <div id="demo0"></div>
+    </div>
+</div>
+
+
+<script src="layui/layui.js"></script>
+<script>
+    layui.config({
+        base: 'js/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'table', 'laypage'], function () {
+        var $ = layui.$
+            , form = layui.form
+            , laypage = layui.laypage
+            , admin = layui.admin
+            , count = 0
+            , currpage = 1;
+
+        //先获取一次数据总数
+        admin.req({
+            url: '/appinfo/applist_'
+            , type: 'post'
+            , data: {"curr": layui.sessionData('page').curr || 1}
+            , done: function (res) {
+                count = res.data.total;
+                page(count);
+                insterPage(res);
+            }
+        });
+
+
+        //分页
+        function page(count) {
+            //执行一个laypage实例
+            laypage.render({
+                elem: 'demo0'
+                , limit: 10
+                , count: count//数据总数
+                , curr: layui.sessionData('page').curr || 1
+                , layout: ['limit', 'count', 'prev', 'page', 'next']
+                , jump: function (obj, first) {
+                    if (!first) {
+                        console.log("123");
+                        if (obj) {
+                            layui.sessionData("page", {
+                                key: 'curr'
+                                , value: obj.curr
+                            });
+                            //首次不执行
+                            admin.req({
+                                url: '/appinfo/applist_'
+                                , type: 'post'
+                                , data: obj
+                                , done: function (res) {
+                                    insterPage(res)
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+        }
+
+
+        function insterPage(res) {
+            var domain = res.data.host;
+            var list = res.data.list;
+            var html = "";
+            list.forEach(function (v) {
+
+                    html += ' <div id="' + v.id + '" class="layui-col-md2 layui-col-sm4">\n' +
+                        '            <div class="cmdlist-container" style="text-align: center">\n' +
+                        '                <a href="javascript:;">\n' +
+                        '                    <img class="layui-circle" style="height: 150px;width:150px;margin-top: 15px" src="' + (v.imgUrl != undefined ? domain + v.imgUrl : "style/res/bg-none.jpg") + ' "></a>\n' +
+                        '                <a href="javascript:;">\n' +
+                        '                    <div class="cmdlist-text">\n' +
+                        '                        <p class="info">' + v.name + '</p>\n' +
+                        '                        <div class="price">\n' +
+                        '          <span class="flow">\n' +
+                        '            <div class="layui-btn-group layui-form">\n' +
+                        '              <div type="button" class=" layui-unselect layui-form-select downpanel" id="BatchBtn">\n' +
+                        '                <div class="layui-select-title">\n' +
+                        '                  <i class="layui-icon layui-icon-more"></i>\n' +
+                        '                </div>\n' +
+                        '                <dl class="layui-anim layui-anim-upbit">\n' +
+                        '                  <dd data-id="' + v.id + '" name="del" title="删除选中文章到回收站">\n' +
+                        '                    <i class="layui-icon"></i>删除</dd>\n' +
+                        '                  <dd data-id="' + v.id + '" name="edit" title="移动选中文章到某栏目">\n' +
+                        '                    <i class="layui-icon" ></i>编辑</dd></dl>\n' +
+                        '              </div>\n' +
+                        '            </div>\n' +
+                        '          </span>\n' +
+                        '                        </div>\n' +
+                        '                    </div>\n' +
+                        '                </a>\n' +
+                        '            </div>\n' +
+                        '        </div>';
+
+                }
+            );
+
+            $("#content-div").html(html);
+            //下拉菜单
+            $(".downpanel").on("click", ".layui-select-title", function (e) {
+                $(".layui-form-select").not($(this).parents(".layui-form-select")).removeClass("layui-form-selected");
+                $(this).parents(".layui-form-select").toggleClass("layui-form-selected");
+                e.stopPropagation();
+            });
+
+            //给菜单绑定点击事件
+            $("dd[name='del']").click(function () {
+                //获取ID
+                var id = this.dataset.id;
+
+                layer.confirm('确定要删除该应用吗？', {
+                    title: "提示",
+                    btn: ['确定', '取消'] //按钮
+                }, function () {
+                    admin.req({
+                        url: '/appinfo/delApp_'
+                        , type: 'post'
+                        , data: {"id": id}
+                        , done: function (res) {
+                            layer.msg('删除成功', {
+                                offset: '15px'
+                                , icon: 1
+                                , time: 1000
+                            }, function () {
+                                location.reload();
+                            });
+
+                        }
+                    });
+                }, function (index) {
+                    layer.close(index);
+                });
+            })
+
+            $("dd[name='edit']").click(function () {
+                //获取ID
+                var id = this.dataset.id;
+                layer.open({
+                    type: 2
+                    , title: '编辑应用'
+                    , content: '/addApp'
+                    , closeBtn: 0
+                    , area: ['600px', '600px']
+                    , btn: ['确定', '取消']
+                    , success: function (layero, index) {
+                        //获取弹出窗口本身
+                        var iframeWindow = window[layero.find('iframe')[0]['name']];
+                        //给子页面传值
+                        iframeWindow.byVal(id);
+
+                    }
+                    , yes: function (index, layero) {
+                        //获取弹出窗口的body
+                        var body = layer.getChildFrame('body', index);
+                        //获取弹出窗口本身
+                        var iframeWindow = window[layero.find('iframe')[0]['name']]
+                            , submitID = 'LAY-user-front-submit',
+                            //找到submit提交按钮
+                            submit = layero.find('iframe').contents().find('#' + submitID);
+
+                        //获取子窗口参数值
+                        //console.log(iframeWindow.status);
+
+                        //监听提交
+                        iframeWindow.layui.form.on('submit(' + submitID + ')', function (data) {
+                            var field = data.field; //获取提交的字段
+
+                            admin.req({
+                                url: '/appinfo/updateApp_'
+                                , type: 'post'
+                                , data: field
+                                , done: function (res) {
+                                    layer.msg('修改成功', {
+                                        offset: '15px'
+                                        , icon: 1
+                                        , time: 1000
+                                    }, function () {
+                                        layer.close(index); //关闭弹层
+                                        location.reload();
+                                    });
+
+
+                                }
+                            });
+                        });
+                        //绑定点击事件
+                        submit.trigger('click');
+                    }
+                    , end: function () {
+
+                    }
+                });
+            })
+
+
+        }
+
+
+        //事件
+        var active = {
+            add: function () {
+                layer.open({
+                    type: 2
+                    , title: '添加应用'
+                    , content: '/addApp'
+                    , closeBtn: 0
+                    , area: ['600px', '600px']
+                    , btn: ['确定', '取消']
+                    , yes: function (index, layero) {
+                        //获取弹出窗口的body
+                        var body = layer.getChildFrame('body', index);
+                        //获取弹出窗口本身
+                        var iframeWindow = window[layero.find('iframe')[0]['name']]
+                            , submitID = 'LAY-user-front-submit',
+                            //找到submit提交按钮
+                            submit = layero.find('iframe').contents().find('#' + submitID);
+
+                        //监听提交
+                        iframeWindow.layui.form.on('submit(' + submitID + ')', function (data) {
+                            var field = data.field; //获取提交的字段
+                            //提交 Ajax 成功后，静态更新表格中的数据
+                            admin.req({
+                                url: '/appinfo/addApp_'
+                                , type: 'post'
+                                , data: field
+                                , done: function (res) {
+
+                                    layer.msg('添加成功', {
+                                        offset: '15px'
+                                        , icon: 1
+                                        , time: 1000
+                                    }, function () {
+                                        layer.close(index); //关闭弹层
+                                        location.reload();
+                                    });
+                                }
+                            });
+                        });
+                        //绑定点击事件
+                        submit.trigger('click');
+                    }
+                    , end: function () {
+
+                    }
+                });
+            }
+        };
+
+        $('.layui-btn').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+
+        $(".layui-icon-more").click(function () {
+            $(".tooltips").toggleClass("layui-hide");
+        });
+
+
+    });
+
+
+</script>
+</body>
+</html>
