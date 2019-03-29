@@ -38,6 +38,8 @@ https://blog.csdn.net/KokJuis
 https://blog.csdn.net/KokJuis/article/details/76147489
 
 
+以下是简单的截图
+
 ![image](https://github.com/gogym/gogym-oss/blob/master/1.png)
 
 ![image](https://github.com/gogym/gogym-oss/blob/master/2.png)
